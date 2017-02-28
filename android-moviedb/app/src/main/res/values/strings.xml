@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Android Movies</string>
+    <string name="upcoming">Upcoming</string>
+    <string name="genres">Genres</string>
+    <string name="search">Search</string>
+    <string name="error_loading">Error loading items. Please check your connection.</string>
+</resources>
