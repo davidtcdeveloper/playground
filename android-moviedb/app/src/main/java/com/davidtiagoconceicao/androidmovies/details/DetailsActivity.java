@@ -2,27 +2,20 @@ package com.davidtiagoconceicao.androidmovies.details;
 
 import android.content.Context;
 import android.content.Intent;
+import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.davidtiagoconceicao.androidmovies.R;
 import com.davidtiagoconceicao.androidmovies.commons.DateFormatUtil;
 import com.davidtiagoconceicao.androidmovies.commons.GenreUtil;
-import com.davidtiagoconceicao.androidmovies.data.Genre;
 import com.davidtiagoconceicao.androidmovies.data.Movie;
 import com.davidtiagoconceicao.androidmovies.databinding.ActivityDetailsBinding;
 import com.squareup.picasso.Picasso;
-
-import java.util.List;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 /**
  * Activity for displaying movie details.
@@ -60,6 +53,7 @@ public final class DetailsActivity extends AppCompatActivity {
         binding.setMovie(movie);
         binding.setGenres(new GenresBinder(movie, this));
         binding.setDate(new DateBinder(movie));
+        binding.setImage(new ImageBinder(movie));
     }
 
     private void bindView(Movie movie) {
@@ -133,6 +127,32 @@ public final class DetailsActivity extends AppCompatActivity {
 
         public String getReleaseDate() {
             return DateFormatUtil.formatDate(movie.releaseDate());
+        }
+    }
+
+    public static final class ImageBinder {
+
+        private final Movie movie;
+
+        public ImageBinder(Movie movie) {
+            this.movie = movie;
+        }
+
+        public String getImageUrl() {
+            return movie.posterPath();
+        }
+
+        @BindingAdapter({"bind:imageUrl"})
+        public static void loadImage(ImageView imageView, String imageUrl) {
+
+            if (imageUrl != null) {
+                Picasso.with(imageView.getContext())
+                        .load(imageUrl)
+                        .fit()
+                        .centerInside()
+                        .into(imageView);
+            }
+
         }
     }
 }
