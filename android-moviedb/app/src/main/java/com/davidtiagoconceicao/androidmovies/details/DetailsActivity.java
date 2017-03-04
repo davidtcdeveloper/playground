@@ -58,7 +58,8 @@ public final class DetailsActivity extends AppCompatActivity {
 
         ActivityDetailsBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_details);
         binding.setMovie(movie);
-
+        binding.setGenres(new GenresBinder(movie, this));
+        binding.setDate(new DateBinder(movie));
     }
 
     private void bindView(Movie movie) {
@@ -105,6 +106,33 @@ public final class DetailsActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             detailsActivity.onBackPressed();
+        }
+    }
+
+    public static final class GenresBinder {
+
+        private final Movie movie;
+        private final Context context;
+
+        private GenresBinder(Movie movie, Context context) {
+            this.movie = movie;
+            this.context = context;
+        }
+
+        public CharSequence getGenres() {
+            return GenreUtil.createGenresSpannable(context, movie.genres());
+        }
+    }
+
+    public static final class DateBinder {
+        private final Movie movie;
+
+        private DateBinder(Movie movie) {
+            this.movie = movie;
+        }
+
+        public String getReleaseDate() {
+            return DateFormatUtil.formatDate(movie.releaseDate());
         }
     }
 }

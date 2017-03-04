@@ -8,6 +8,14 @@
         <variable
             name="movie"
             type="com.davidtiagoconceicao.androidmovies.data.Movie" />
+
+        <variable
+            name="genres"
+            type="com.davidtiagoconceicao.androidmovies.details.DetailsActivity.GenresBinder" />
+
+        <variable
+            name="date"
+            type="com.davidtiagoconceicao.androidmovies.details.DetailsActivity.DateBinder" />
     </data>
 
     <android.support.design.widget.CoordinatorLayout
@@ -91,6 +99,7 @@
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
                     android:layout_marginTop="8dp"
+                    android:text="@{genres.genres}"
                     android:textColor="@color/primary_inverse_text"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
@@ -103,7 +112,7 @@
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
                     android:layout_marginTop="8dp"
-                    android:text="@string/genres"
+                    android:text="@string/release_date"
                     android:textSize="12sp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
@@ -116,6 +125,7 @@
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
                     android:layout_marginTop="8dp"
+                    android:text="@{date.releaseDate}"
                     android:textColor="@color/primary_text"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
