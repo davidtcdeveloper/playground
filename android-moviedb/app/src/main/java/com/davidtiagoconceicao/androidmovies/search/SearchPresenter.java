@@ -12,10 +12,13 @@ import com.davidtiagoconceicao.androidmovies.data.remote.genre.GenresRemoteRepos
 import com.davidtiagoconceicao.androidmovies.data.remote.movie.MoviesRemoteRepository;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
+import rx.subjects.PublishSubject;
 import rx.subscriptions.CompositeSubscription;
 
 /**
@@ -34,6 +37,7 @@ final class SearchPresenter implements SearchContract.Presenter {
 
     private LongSparseArray<Genre> genres;
     private ImageConfiguration imageConfiguration;
+    private final PublishSubject<String> searchSubject;
 
     SearchPresenter(
             SearchContract.View view,
@@ -46,6 +50,43 @@ final class SearchPresenter implements SearchContract.Presenter {
         this.genresRemoteRepository = genresRemoteRepository;
         this.configurationRepository = configurationRepository;
         this.compositeSubscription = new CompositeSubscription();
+
+        searchSubject = PublishSubject.create();
+
+        compositeSubscription.add(
+                searchSubject
+                        .debounce(300, TimeUnit.MILLISECONDS)
+                        .flatMap(
+                                new Func1<String, Observable<List<Movie>>>() {
+                                    @Override
+                                    public Observable<List<Movie>> call(String query) {
+                                        return SearchPresenter.this.moviesRemoteRepository.searchMovie(query)
+                                                .map(new Func1<Movie, Movie>() {
+                                                    @Override
+                                                    public Movie call(Movie movie) {
+                                                        return MovieUtil.mapMovieFields(movie, imageConfiguration, genres);
+                                                    }
+                                                })
+                                                .toList();
+                                    }
+                                })
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Observer<List<Movie>>() {
+                            @Override
+                            public void onCompleted() {
+                                SearchPresenter.this.view.showLoading(false);
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                SearchPresenter.this.handleException(e);
+                            }
+
+                            @Override
+                            public void onNext(List<Movie> movies) {
+                                SearchPresenter.this.view.showResult(movies);
+                            }
+                        }));
 
         this.view.setPresenter(this);
     }
@@ -71,7 +112,7 @@ final class SearchPresenter implements SearchContract.Presenter {
             loadGenres(query);
 
         } else {
-            queryRepository(query);
+            searchSubject.onNext(query);
         }
     }
 
@@ -81,38 +122,6 @@ final class SearchPresenter implements SearchContract.Presenter {
         Log.e(getClass().getSimpleName(), "Exception on stream", e);
         view.showErrorLoading();
         view.showLoading(false);
-    }
-
-    //Called by inner classes
-    @SuppressWarnings("WeakerAccess")
-    void queryRepository(String query) {
-        view.showLoading(true);
-        compositeSubscription.add(
-                moviesRemoteRepository.searchMovie(query)
-                        .map(new Func1<Movie, Movie>() {
-                            @Override
-                            public Movie call(Movie movie) {
-                                return MovieUtil.mapMovieFields(movie, imageConfiguration, genres);
-                            }
-                        })
-                        .toList()
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Observer<List<Movie>>() {
-                            @Override
-                            public void onCompleted() {
-                                view.showLoading(false);
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                handleException(e);
-                            }
-
-                            @Override
-                            public void onNext(List<Movie> movies) {
-                                view.showResult(movies);
-                            }
-                        }));
     }
 
     //Called by inner classes, default avoid accessors
@@ -128,7 +137,7 @@ final class SearchPresenter implements SearchContract.Presenter {
                                 if (imageConfiguration == null) {
                                     loadImageConfiguration(query);
                                 } else {
-                                    queryRepository(query);
+                                    searchSubject.onNext(query);
                                 }
                             }
 
@@ -153,7 +162,7 @@ final class SearchPresenter implements SearchContract.Presenter {
                         .subscribe(new Observer<ImageConfiguration>() {
                             @Override
                             public void onCompleted() {
-                                queryRepository(query);
+                                searchSubject.onNext(query);
                             }
 
                             @Override
