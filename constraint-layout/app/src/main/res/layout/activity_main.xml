@@ -99,7 +99,7 @@
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:tint="@android:color/darker_gray"
-        app:layout_constraintBottom_toBottomOf="@+id/main_picture_details_image"
+        app:layout_constraintBottom_toBottomOf="@+id/main_picture_details_text"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/main_camera_image"
         app:srcCompat="@drawable/ic_landscape_black_24dp"
@@ -121,7 +121,7 @@
         tools:text="File name" />
 
     <TextView
-        android:id="@+id/main_picture_details_image"
+        android:id="@+id/main_picture_details_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="0dp"
