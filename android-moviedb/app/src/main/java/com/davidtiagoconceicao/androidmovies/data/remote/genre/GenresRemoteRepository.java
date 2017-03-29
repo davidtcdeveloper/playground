@@ -5,9 +5,9 @@ import com.davidtiagoconceicao.androidmovies.data.Genre;
 
 import java.util.List;
 
-import rx.Observable;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
+import io.reactivex.Observable;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Repository for remote genres operations.
@@ -20,21 +20,21 @@ public final class GenresRemoteRepository {
     public Observable<Genre> getGenres() {
         return RetrofitServiceGenerator.generateService(GenresEndpoint.class)
                 .getGenres()
-                .map(new Func1<GenresListResponse, List<GenreResponse>>() {
+                .map(new Function<GenresListResponse, List<GenreResponse>>() {
                     @Override
-                    public List<GenreResponse> call(GenresListResponse genresListResponse) {
+                    public List<GenreResponse> apply(GenresListResponse genresListResponse) throws Exception {
                         return genresListResponse.genres();
                     }
                 })
-                .flatMapIterable(new Func1<List<GenreResponse>, Iterable<GenreResponse>>() {
+                .flatMapIterable(new Function<List<GenreResponse>, Iterable<GenreResponse>>() {
                     @Override
-                    public Iterable<GenreResponse> call(List<GenreResponse> genreResponses) {
+                    public Iterable<GenreResponse> apply(List<GenreResponse> genreResponses) throws Exception {
                         return genreResponses;
                     }
                 })
-                .map(new Func1<GenreResponse, Genre>() {
+                .map(new Function<GenreResponse, Genre>() {
                     @Override
-                    public Genre call(GenreResponse genreResponse) {
+                    public Genre apply(GenreResponse genreResponse) throws Exception {
                         return Genre.create(genreResponse.id(), genreResponse.name());
                     }
                 })

@@ -22,7 +22,8 @@ public final class DateFormatUtil {
             SimpleDateFormat.getDateInstance();
 
     public static Date parseDate(String date) {
-        if (date == null) {
+        if (date == null
+                || date.isEmpty()) {
             return null;
         }
         try {

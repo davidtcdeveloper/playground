@@ -1,7 +1,7 @@
 package com.davidtiagoconceicao.androidmovies.data.remote.genre;
 
+import io.reactivex.Observable;
 import retrofit2.http.GET;
-import rx.Observable;
 
 /**
  * Endpoint for movies operations.

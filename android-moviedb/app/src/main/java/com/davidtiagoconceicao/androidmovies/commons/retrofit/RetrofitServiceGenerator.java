@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 /**
  * Common class for retrofit service generation.
@@ -26,7 +26,7 @@ public final class RetrofitServiceGenerator {
 
         return new Retrofit.Builder()
                 .client(getOkHttpClient())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(DefaultGsonConverter.getConverter())
                 .baseUrl(BuildConfig.API_URL)
                 .build()

@@ -13,10 +13,12 @@ import com.davidtiagoconceicao.androidmovies.data.remote.movie.MoviesRemoteRepos
 
 import java.util.List;
 
-import rx.Observer;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.subscriptions.CompositeSubscription;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Function;
+import io.reactivex.observers.ResourceSingleObserver;
+import io.reactivex.subscribers.ResourceSubscriber;
 
 /**
  * Presenter for upcoming movies list.
@@ -26,7 +28,7 @@ import rx.subscriptions.CompositeSubscription;
 
 final class UpcomingListPresenter implements UpcomingListContract.Presenter {
 
-    private final CompositeSubscription compositeSubscription;
+    private final CompositeDisposable compositeSubscription;
     private final UpcomingListContract.View view;
     private final MoviesRemoteRepository moviesRemoteRepository;
     private final GenresRemoteRepository genresRemoteRepository;
@@ -47,7 +49,7 @@ final class UpcomingListPresenter implements UpcomingListContract.Presenter {
         this.moviesRemoteRepository = moviesRemoteRepository;
         this.genresRemoteRepository = genresRemoteRepository;
         this.configurationRepository = configurationRepository;
-        this.compositeSubscription = new CompositeSubscription();
+        this.compositeSubscription = new CompositeDisposable();
 
         this.view.setPresenter(this);
     }
@@ -98,31 +100,30 @@ final class UpcomingListPresenter implements UpcomingListContract.Presenter {
         view.showLoading(true);
         compositeSubscription.add(
                 moviesRemoteRepository.getUpcoming(currentPageCount)
-                        .map(new Func1<Movie, Movie>() {
+                        .map(new Function<Movie, Movie>() {
                             @Override
-                            public Movie call(Movie movie) {
+                            public Movie apply(Movie movie) throws Exception {
                                 return MovieUtil.mapMovieFields(movie, imageConfiguration, genres);
                             }
                         })
                         .toList()
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Observer<List<Movie>>() {
+                        .subscribeWith(new ResourceSingleObserver<List<Movie>>() {
                             @Override
-                            public void onCompleted() {
-                                view.showLoading(false);
-                            }
+                            public void onSuccess(List<Movie> movies) {
 
-                            @Override
-                            public void onError(Throwable e) {
-                                handleException(e);
-                            }
-
-                            @Override
-                            public void onNext(List<Movie> movies) {
                                 if (currentPageCount == 1) {
                                     view.clearList();
                                 }
                                 view.addMovies(movies);
+
+                                view.showLoading(false);
+                            }
+
+                            @Override
+                            public void onError(Throwable throwable) {
+
+                                view.showLoading(false);
                             }
                         }));
     }
@@ -133,25 +134,25 @@ final class UpcomingListPresenter implements UpcomingListContract.Presenter {
         compositeSubscription.add(
                 genresRemoteRepository.getGenres()
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Observer<Genre>() {
+                        .toFlowable(BackpressureStrategy.BUFFER)
+                        .subscribeWith(new ResourceSubscriber<Genre>() {
+                            @Override
+                            public void onNext(Genre genre) {
+                                genres.put(genre.id(), genre);
+                            }
 
                             @Override
-                            public void onCompleted() {
+                            public void onError(Throwable t) {
+                                handleException(t);
+                            }
+
+                            @Override
+                            public void onComplete() {
                                 if (imageConfiguration == null) {
                                     loadImageConfiguration();
                                 } else {
                                     refresh();
                                 }
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                handleException(e);
-                            }
-
-                            @Override
-                            public void onNext(Genre genre) {
-                                genres.put(genre.id(), genre);
                             }
                         }));
     }
@@ -162,22 +163,24 @@ final class UpcomingListPresenter implements UpcomingListContract.Presenter {
         compositeSubscription.add(
                 configurationRepository.getImageConfiguration()
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Observer<ImageConfiguration>() {
-                            @Override
-                            public void onCompleted() {
-                                refresh();
-                            }
+                        .toFlowable(BackpressureStrategy.BUFFER)
+                        .subscribeWith(
+                                new ResourceSubscriber<ImageConfiguration>() {
+                                    @Override
+                                    public void onNext(ImageConfiguration imageConfigurationResponse) {
+                                        imageConfiguration = imageConfigurationResponse;
+                                    }
 
-                            @Override
-                            public void onError(Throwable e) {
-                                handleException(e);
-                            }
+                                    @Override
+                                    public void onError(Throwable t) {
+                                        handleException(t);
+                                    }
 
-                            @Override
-                            public void onNext(ImageConfiguration imageConfigurationResponse) {
-                                imageConfiguration = imageConfigurationResponse;
-                            }
-                        }));
+                                    @Override
+                                    public void onComplete() {
+                                        refresh();
+                                    }
+                                }));
     }
 
 }

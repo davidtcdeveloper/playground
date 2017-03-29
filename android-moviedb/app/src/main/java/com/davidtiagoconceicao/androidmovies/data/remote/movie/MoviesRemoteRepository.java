@@ -4,9 +4,11 @@ import com.davidtiagoconceicao.androidmovies.commons.DateFormatUtil;
 import com.davidtiagoconceicao.androidmovies.commons.retrofit.RetrofitServiceGenerator;
 import com.davidtiagoconceicao.androidmovies.data.Movie;
 
-import rx.Observable;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
+import java.util.List;
+
+import io.reactivex.Observable;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Repository for movies operations.
@@ -19,15 +21,15 @@ public final class MoviesRemoteRepository {
     public Observable<Movie> getUpcoming(int page) {
         return RetrofitServiceGenerator.generateService(MoviesEndpoint.class)
                 .getUpcoming(page)
-                .flatMapIterable(new Func1<MoviesQueryResponse, Iterable<MovieResponse>>() {
+                .flatMapIterable(new Function<MoviesQueryResponse, List<MovieResponse>>() {
                     @Override
-                    public Iterable<MovieResponse> call(MoviesQueryResponse envelopeResponse) {
+                    public List<MovieResponse> apply(MoviesQueryResponse envelopeResponse) throws Exception {
                         return envelopeResponse.results();
                     }
                 })
-                .map(new Func1<MovieResponse, Movie>() {
+                .map(new Function<MovieResponse, Movie>() {
                     @Override
-                    public Movie call(MovieResponse movieResponse) {
+                    public Movie apply(MovieResponse movieResponse) throws Exception {
                         return mapMovie(movieResponse);
                     }
                 })
@@ -37,15 +39,15 @@ public final class MoviesRemoteRepository {
     public Observable<Movie> searchMovie(String query) {
         return RetrofitServiceGenerator.generateService(MoviesEndpoint.class)
                 .getSearchResults(query)
-                .flatMapIterable(new Func1<MoviesQueryResponse, Iterable<MovieResponse>>() {
+                .flatMapIterable(new Function<MoviesQueryResponse, List<MovieResponse>>() {
                     @Override
-                    public Iterable<MovieResponse> call(MoviesQueryResponse envelopeResponse) {
+                    public List<MovieResponse> apply(MoviesQueryResponse envelopeResponse) throws Exception {
                         return envelopeResponse.results();
                     }
                 })
-                .map(new Func1<MovieResponse, Movie>() {
+                .map(new Function<MovieResponse, Movie>() {
                     @Override
-                    public Movie call(MovieResponse movieResponse) {
+                    public Movie apply(MovieResponse movieResponse) throws Exception {
                         return mapMovie(movieResponse);
                     }
                 })

@@ -8,9 +8,9 @@ import com.davidtiagoconceicao.androidmovies.data.ImageConfiguration;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import rx.Observable;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
+import io.reactivex.Observable;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Class for obtaining configuration data.
@@ -25,10 +25,9 @@ public final class ConfigurationRepository {
     public Observable<ImageConfiguration> getImageConfiguration() {
         return RetrofitServiceGenerator.generateService(ConfigurationEndpoint.class)
                 .getConfiguration()
-                .map(new Func1<ConfigurationsResponseEnvelope, ImageConfiguration>() {
+                .map(new Function<ConfigurationsResponseEnvelope, ImageConfiguration>() {
                     @Override
-                    public ImageConfiguration call(ConfigurationsResponseEnvelope configurationsResponseEnvelope) {
-
+                    public ImageConfiguration apply(ConfigurationsResponseEnvelope configurationsResponseEnvelope) throws Exception {
                         ConfigurationResponse configurationResponse = configurationsResponseEnvelope.images();
 
                         String baseUrl = configurationResponse.baseUrl();

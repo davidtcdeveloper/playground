@@ -14,12 +14,15 @@ import com.davidtiagoconceicao.androidmovies.data.remote.movie.MoviesRemoteRepos
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import rx.Observable;
-import rx.Observer;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.subjects.PublishSubject;
-import rx.subscriptions.CompositeSubscription;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.ObservableSource;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
+import io.reactivex.observers.ResourceSingleObserver;
+import io.reactivex.subjects.PublishSubject;
+import io.reactivex.subscribers.ResourceSubscriber;
 
 /**
  * Presenter for upcoming movies list.
@@ -29,7 +32,7 @@ import rx.subscriptions.CompositeSubscription;
 
 final class SearchPresenter implements SearchContract.Presenter {
 
-    private final CompositeSubscription compositeSubscription;
+    private final CompositeDisposable compositeDisposable;
     private final SearchContract.View view;
     private final MoviesRemoteRepository moviesRemoteRepository;
     private final GenresRemoteRepository genresRemoteRepository;
@@ -49,42 +52,47 @@ final class SearchPresenter implements SearchContract.Presenter {
         this.moviesRemoteRepository = moviesRemoteRepository;
         this.genresRemoteRepository = genresRemoteRepository;
         this.configurationRepository = configurationRepository;
-        this.compositeSubscription = new CompositeSubscription();
+        this.compositeDisposable = new CompositeDisposable();
 
         searchSubject = PublishSubject.create();
-
-        compositeSubscription.add(
+        compositeDisposable.add(
                 searchSubject
-                        .debounce(300, TimeUnit.MILLISECONDS)
-                        .flatMap(
-                                new Func1<String, Observable<List<Movie>>>() {
-                                    @Override
-                                    public Observable<List<Movie>> call(String query) {
-                                        return SearchPresenter.this.moviesRemoteRepository.searchMovie(query)
-                                                .map(new Func1<Movie, Movie>() {
-                                                    @Override
-                                                    public Movie call(Movie movie) {
-                                                        return MovieUtil.mapMovieFields(movie, imageConfiguration, genres);
-                                                    }
-                                                })
-                                                .toList();
-                                    }
-                                })
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Observer<List<Movie>>() {
+                        .filter(new Predicate<String>() {
                             @Override
-                            public void onCompleted() {
+                            public boolean test(String s) throws Exception {
+                                return s.length() >= 3;
+                            }
+                        })
+                        .debounce(300, TimeUnit.MILLISECONDS)
+                        .flatMap(new Function<String, ObservableSource<Movie>>() {
+                            @Override
+                            public ObservableSource<Movie> apply(String s) throws Exception {return SearchPresenter.this.moviesRemoteRepository.searchMovie(s)
+                                        .map(new Function<Movie, Movie>() {
+                                            @Override
+                                            public Movie apply(Movie movie) throws Exception {
+                                                return MovieUtil.mapMovieFields(movie, imageConfiguration, genres);
+                                            }
+                                        });
+                            }
+                        })
+                        .toList()
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .toFlowable()
+                        .subscribeWith(new ResourceSubscriber<List<Movie>>() {
+                            @Override
+                            public void onNext(List<Movie> movies) {
+                                SearchPresenter.this.view.showResult(movies);
+                            }
+
+                            @Override
+                            public void onError(Throwable t) {
+                                SearchPresenter.this.handleException(t);
                                 SearchPresenter.this.view.showLoading(false);
                             }
 
                             @Override
-                            public void onError(Throwable e) {
-                                SearchPresenter.this.handleException(e);
-                            }
-
-                            @Override
-                            public void onNext(List<Movie> movies) {
-                                SearchPresenter.this.view.showResult(movies);
+                            public void onComplete() {
+                                SearchPresenter.this.view.showLoading(false);
                             }
                         }));
 
@@ -99,7 +107,7 @@ final class SearchPresenter implements SearchContract.Presenter {
 
     @Override
     public void onDetach() {
-        compositeSubscription.clear();
+        compositeDisposable.clear();
     }
 
     @Override
@@ -127,28 +135,28 @@ final class SearchPresenter implements SearchContract.Presenter {
     //Called by inner classes, default avoid accessors
     @SuppressWarnings("WeakerAccess")
     void loadGenres(final String query) {
-        compositeSubscription.add(
+        compositeDisposable.add(
                 genresRemoteRepository.getGenres()
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Observer<Genre>() {
+                        .toFlowable(BackpressureStrategy.BUFFER)
+                        .subscribeWith(new ResourceSubscriber<Genre>() {
+                            @Override
+                            public void onNext(Genre genre) {
+                                genres.put(genre.id(), genre);
+                            }
 
                             @Override
-                            public void onCompleted() {
+                            public void onError(Throwable t) {
+                                handleException(t);
+                            }
+
+                            @Override
+                            public void onComplete() {
                                 if (imageConfiguration == null) {
                                     loadImageConfiguration(query);
                                 } else {
                                     searchSubject.onNext(query);
                                 }
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                handleException(e);
-                            }
-
-                            @Override
-                            public void onNext(Genre genre) {
-                                genres.put(genre.id(), genre);
                             }
                         }));
     }
@@ -156,23 +164,24 @@ final class SearchPresenter implements SearchContract.Presenter {
     //Called by inner classes, default avoid accessors
     @SuppressWarnings("WeakerAccess")
     void loadImageConfiguration(final String query) {
-        compositeSubscription.add(
+        compositeDisposable.add(
                 configurationRepository.getImageConfiguration()
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Observer<ImageConfiguration>() {
-                            @Override
-                            public void onCompleted() {
-                                searchSubject.onNext(query);
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                handleException(e);
-                            }
-
+                        .toFlowable(BackpressureStrategy.BUFFER)
+                        .subscribeWith(new ResourceSubscriber<ImageConfiguration>() {
                             @Override
                             public void onNext(ImageConfiguration imageConfigurationResponse) {
                                 imageConfiguration = imageConfigurationResponse;
+                            }
+
+                            @Override
+                            public void onError(Throwable t) {
+                                handleException(t);
+                            }
+
+                            @Override
+                            public void onComplete() {
+                                searchSubject.onNext(query);
                             }
                         }));
     }
