@@ -11,4 +11,6 @@ public interface BasePresenter {
     void onAttach();
 
     void onDetach();
+
+    void onDestroy();
 }

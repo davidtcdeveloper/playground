@@ -85,6 +85,24 @@ public final class SearchActivity extends AppCompatActivity implements SearchCon
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        presenter.onAttach();
+    }
+
+    @Override
+    protected void onStop() {
+        presenter.onDetach();
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        presenter.onDestroy();
+        super.onDestroy();
+    }
+
+    @Override
     public void setPresenter(SearchContract.Presenter presenter) {
 
         this.presenter = presenter;

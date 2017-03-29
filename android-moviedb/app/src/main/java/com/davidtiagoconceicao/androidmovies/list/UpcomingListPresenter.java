@@ -28,7 +28,7 @@ import io.reactivex.subscribers.ResourceSubscriber;
 
 final class UpcomingListPresenter implements UpcomingListContract.Presenter {
 
-    private final CompositeDisposable compositeSubscription;
+    private final CompositeDisposable compositeDisposable;
     private final UpcomingListContract.View view;
     private final MoviesRemoteRepository moviesRemoteRepository;
     private final GenresRemoteRepository genresRemoteRepository;
@@ -49,7 +49,7 @@ final class UpcomingListPresenter implements UpcomingListContract.Presenter {
         this.moviesRemoteRepository = moviesRemoteRepository;
         this.genresRemoteRepository = genresRemoteRepository;
         this.configurationRepository = configurationRepository;
-        this.compositeSubscription = new CompositeDisposable();
+        this.compositeDisposable = new CompositeDisposable();
 
         this.view.setPresenter(this);
     }
@@ -71,7 +71,12 @@ final class UpcomingListPresenter implements UpcomingListContract.Presenter {
 
     @Override
     public void onDetach() {
-        compositeSubscription.clear();
+        compositeDisposable.clear();
+    }
+
+    @Override
+    public void onDestroy() {
+        compositeDisposable.dispose();
     }
 
     @Override
@@ -98,7 +103,7 @@ final class UpcomingListPresenter implements UpcomingListContract.Presenter {
     @SuppressWarnings("WeakerAccess")
     void loadMoreItems() {
         view.showLoading(true);
-        compositeSubscription.add(
+        compositeDisposable.add(
                 moviesRemoteRepository.getUpcoming(currentPageCount)
                         .map(new Function<Movie, Movie>() {
                             @Override
@@ -131,7 +136,7 @@ final class UpcomingListPresenter implements UpcomingListContract.Presenter {
     //Called by inner classes
     @SuppressWarnings("WeakerAccess")
     void loadGenres() {
-        compositeSubscription.add(
+        compositeDisposable.add(
                 genresRemoteRepository.getGenres()
                         .observeOn(AndroidSchedulers.mainThread())
                         .toFlowable(BackpressureStrategy.BUFFER)
@@ -160,7 +165,7 @@ final class UpcomingListPresenter implements UpcomingListContract.Presenter {
     //Called by inner classes, default avoid accessors
     @SuppressWarnings("WeakerAccess")
     void loadImageConfiguration() {
-        compositeSubscription.add(
+        compositeDisposable.add(
                 configurationRepository.getImageConfiguration()
                         .observeOn(AndroidSchedulers.mainThread())
                         .toFlowable(BackpressureStrategy.BUFFER)

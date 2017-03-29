@@ -66,7 +66,8 @@ final class SearchPresenter implements SearchContract.Presenter {
                         .debounce(300, TimeUnit.MILLISECONDS)
                         .flatMap(new Function<String, ObservableSource<Movie>>() {
                             @Override
-                            public ObservableSource<Movie> apply(String s) throws Exception {return SearchPresenter.this.moviesRemoteRepository.searchMovie(s)
+                            public ObservableSource<Movie> apply(String s) throws Exception {
+                                return SearchPresenter.this.moviesRemoteRepository.searchMovie(s)
                                         .map(new Function<Movie, Movie>() {
                                             @Override
                                             public Movie apply(Movie movie) throws Exception {
@@ -108,6 +109,11 @@ final class SearchPresenter implements SearchContract.Presenter {
     @Override
     public void onDetach() {
         compositeDisposable.clear();
+    }
+
+    @Override
+    public void onDestroy() {
+        compositeDisposable.dispose();
     }
 
     @Override
