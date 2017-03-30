@@ -1,6 +1,7 @@
 package com.davidtiagoconceicao.androidmovies.data.remote.movie;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
@@ -13,11 +14,11 @@ import retrofit2.http.Query;
 interface MoviesEndpoint {
 
     @GET("movie/upcoming")
-    Observable<MoviesQueryResponse> getUpcoming(
+    Single<MoviesQueryResponse> getUpcoming(
             @Query("page") int requestedPage);
 
     @GET("search/movie")
-    Observable<MoviesQueryResponse> getSearchResults(
+    Single<MoviesQueryResponse> getSearchResults(
             @Query("query") String query);
 
 }

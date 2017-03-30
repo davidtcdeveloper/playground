@@ -72,7 +72,8 @@ final class SearchPresenter implements SearchContract.Presenter {
                                             public Movie apply(Movie movie) throws Exception {
                                                 return MovieUtil.mapMovieFields(movie, imageConfiguration, genres);
                                             }
-                                        });
+                                        })
+                                        .toObservable();
                             }
                         })
                         .toList()
@@ -171,7 +172,7 @@ final class SearchPresenter implements SearchContract.Presenter {
         compositeDisposable.add(
                 configurationRepository.getImageConfiguration()
                         .observeOn(AndroidSchedulers.mainThread())
-                        .toFlowable(BackpressureStrategy.BUFFER)
+                        .toFlowable()
                         .subscribeWith(new ResourceSubscriber<ImageConfiguration>() {
                             @Override
                             public void onNext(ImageConfiguration imageConfigurationResponse) {

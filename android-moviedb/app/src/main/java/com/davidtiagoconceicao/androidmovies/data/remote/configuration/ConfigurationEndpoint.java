@@ -1,6 +1,6 @@
 package com.davidtiagoconceicao.androidmovies.data.remote.configuration;
 
-import io.reactivex.Observable;
+import io.reactivex.Single;
 import retrofit2.http.GET;
 
 /**
@@ -11,5 +11,5 @@ import retrofit2.http.GET;
 
 interface ConfigurationEndpoint {
     @GET("configuration")
-    Observable<ConfigurationsResponseEnvelope> getConfiguration();
+    Single<ConfigurationsResponseEnvelope> getConfiguration();
 }

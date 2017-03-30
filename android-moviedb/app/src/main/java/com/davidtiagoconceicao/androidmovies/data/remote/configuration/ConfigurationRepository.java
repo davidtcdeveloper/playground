@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
@@ -22,7 +23,7 @@ public final class ConfigurationRepository {
 
     private static final String SIZE_REGEX = "w\\d*";
 
-    public Observable<ImageConfiguration> getImageConfiguration() {
+    public Single<ImageConfiguration> getImageConfiguration() {
         return RetrofitServiceGenerator.generateService(ConfigurationEndpoint.class)
                 .getConfiguration()
                 .map(new Function<ConfigurationsResponseEnvelope, ImageConfiguration>() {

@@ -16,6 +16,7 @@ import java.util.List;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Function;
 import io.reactivex.observers.ResourceSingleObserver;
 import io.reactivex.subscribers.ResourceSubscriber;
@@ -167,7 +168,7 @@ final class UpcomingListPresenter implements UpcomingListContract.Presenter {
         compositeDisposable.add(
                 configurationRepository.getImageConfiguration()
                         .observeOn(AndroidSchedulers.mainThread())
-                        .toFlowable(BackpressureStrategy.BUFFER)
+                        .toFlowable()
                         .subscribeWith(
                                 new ResourceSubscriber<ImageConfiguration>() {
                                     @Override

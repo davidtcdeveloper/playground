@@ -6,7 +6,7 @@ import com.davidtiagoconceicao.androidmovies.data.Movie;
 
 import java.util.List;
 
-import io.reactivex.Observable;
+import io.reactivex.Flowable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
@@ -18,9 +18,10 @@ import io.reactivex.schedulers.Schedulers;
 
 public final class MoviesRemoteRepository {
 
-    public Observable<Movie> getUpcoming(int page) {
+    public Flowable<Movie> getUpcoming(int page) {
         return RetrofitServiceGenerator.generateService(MoviesEndpoint.class)
                 .getUpcoming(page)
+                .toFlowable()
                 .flatMapIterable(new Function<MoviesQueryResponse, List<MovieResponse>>() {
                     @Override
                     public List<MovieResponse> apply(MoviesQueryResponse envelopeResponse) throws Exception {
@@ -36,9 +37,10 @@ public final class MoviesRemoteRepository {
                 .subscribeOn(Schedulers.io());
     }
 
-    public Observable<Movie> searchMovie(String query) {
+    public Flowable<Movie> searchMovie(String query) {
         return RetrofitServiceGenerator.generateService(MoviesEndpoint.class)
                 .getSearchResults(query)
+                .toFlowable()
                 .flatMapIterable(new Function<MoviesQueryResponse, List<MovieResponse>>() {
                     @Override
                     public List<MovieResponse> apply(MoviesQueryResponse envelopeResponse) throws Exception {
