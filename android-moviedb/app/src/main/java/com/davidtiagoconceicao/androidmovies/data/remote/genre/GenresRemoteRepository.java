@@ -5,7 +5,7 @@ import com.davidtiagoconceicao.androidmovies.data.Genre;
 
 import java.util.List;
 
-import io.reactivex.Observable;
+import io.reactivex.Flowable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
@@ -17,7 +17,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public final class GenresRemoteRepository {
 
-    public Observable<Genre> getGenres() {
+    public Flowable<Genre> getGenres() {
         return RetrofitServiceGenerator.generateService(GenresEndpoint.class)
                 .getGenres()
                 .map(new Function<GenresListResponse, List<GenreResponse>>() {
@@ -26,6 +26,7 @@ public final class GenresRemoteRepository {
                         return genresListResponse.genres();
                     }
                 })
+                .toFlowable()
                 .flatMapIterable(new Function<List<GenreResponse>, Iterable<GenreResponse>>() {
                     @Override
                     public Iterable<GenreResponse> apply(List<GenreResponse> genreResponses) throws Exception {

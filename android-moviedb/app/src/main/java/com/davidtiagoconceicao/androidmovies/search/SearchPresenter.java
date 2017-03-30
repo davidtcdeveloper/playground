@@ -20,7 +20,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
-import io.reactivex.observers.ResourceSingleObserver;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subscribers.ResourceSubscriber;
 
@@ -144,7 +143,6 @@ final class SearchPresenter implements SearchContract.Presenter {
         compositeDisposable.add(
                 genresRemoteRepository.getGenres()
                         .observeOn(AndroidSchedulers.mainThread())
-                        .toFlowable(BackpressureStrategy.BUFFER)
                         .subscribeWith(new ResourceSubscriber<Genre>() {
                             @Override
                             public void onNext(Genre genre) {

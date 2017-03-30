@@ -139,7 +139,6 @@ final class UpcomingListPresenter implements UpcomingListContract.Presenter {
         compositeDisposable.add(
                 genresRemoteRepository.getGenres()
                         .observeOn(AndroidSchedulers.mainThread())
-                        .toFlowable(BackpressureStrategy.BUFFER)
                         .subscribeWith(new ResourceSubscriber<Genre>() {
                             @Override
                             public void onNext(Genre genre) {

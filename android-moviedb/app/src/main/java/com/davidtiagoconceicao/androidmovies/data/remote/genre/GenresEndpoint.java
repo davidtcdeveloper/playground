@@ -1,6 +1,6 @@
 package com.davidtiagoconceicao.androidmovies.data.remote.genre;
 
-import io.reactivex.Observable;
+import io.reactivex.Single;
 import retrofit2.http.GET;
 
 /**
@@ -12,6 +12,6 @@ import retrofit2.http.GET;
 public interface GenresEndpoint {
 
     @GET("genre/movie/list")
-    Observable<GenresListResponse> getGenres();
+    Single<GenresListResponse> getGenres();
 
 }
