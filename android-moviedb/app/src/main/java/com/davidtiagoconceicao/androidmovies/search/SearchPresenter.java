@@ -18,6 +18,7 @@ import io.reactivex.BackpressureStrategy;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import io.reactivex.subjects.PublishSubject;
@@ -63,9 +64,9 @@ final class SearchPresenter implements SearchContract.Presenter {
                             }
                         })
                         .debounce(300, TimeUnit.MILLISECONDS)
-                        .flatMap(new Function<String, ObservableSource<Movie>>() {
+                        .flatMap(new Function<String, ObservableSource<List<Movie>>>() {
                             @Override
-                            public ObservableSource<Movie> apply(String s) throws Exception {
+                            public ObservableSource<List<Movie>> apply(String s) throws Exception {
                                 return SearchPresenter.this.moviesRemoteRepository.searchMovie(s)
                                         .map(new Function<Movie, Movie>() {
                                             @Override
@@ -73,16 +74,17 @@ final class SearchPresenter implements SearchContract.Presenter {
                                                 return MovieUtil.mapMovieFields(movie, imageConfiguration, genres);
                                             }
                                         })
+                                        .toList()
                                         .toObservable();
                             }
                         })
-                        .toList()
                         .observeOn(AndroidSchedulers.mainThread())
-                        .toFlowable()
+                        .toFlowable(BackpressureStrategy.BUFFER)
                         .subscribeWith(new ResourceSubscriber<List<Movie>>() {
                             @Override
                             public void onNext(List<Movie> movies) {
                                 SearchPresenter.this.view.showResult(movies);
+                                SearchPresenter.this.view.showLoading(false);
                             }
 
                             @Override
@@ -93,7 +95,7 @@ final class SearchPresenter implements SearchContract.Presenter {
 
                             @Override
                             public void onComplete() {
-                                SearchPresenter.this.view.showLoading(false);
+                                //Never completes
                             }
                         }));
 

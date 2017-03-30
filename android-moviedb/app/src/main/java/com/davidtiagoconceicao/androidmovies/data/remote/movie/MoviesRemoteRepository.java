@@ -1,5 +1,7 @@
 package com.davidtiagoconceicao.androidmovies.data.remote.movie;
 
+import android.util.Log;
+
 import com.davidtiagoconceicao.androidmovies.commons.DateFormatUtil;
 import com.davidtiagoconceicao.androidmovies.commons.retrofit.RetrofitServiceGenerator;
 import com.davidtiagoconceicao.androidmovies.data.Movie;
@@ -7,6 +9,7 @@ import com.davidtiagoconceicao.androidmovies.data.Movie;
 import java.util.List;
 
 import io.reactivex.Flowable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
