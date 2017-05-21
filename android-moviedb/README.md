@@ -3,7 +3,8 @@
 Client project for [The Movie Database API](https://developers.themoviedb.org/3) with upcoming movies list developed using **Android SDK**.
 
 ### Tools and Build
-This project was built using Android Studio 2.3 RC 1 and Android Tools 2.3.0-rc1. To edit this project, is recomended to use the *Import Project* from Android Studio, since the local project settings are not commited to this repository.
+This project was built using Android Studio 3.0 Canary 1 and Android Tools 3.0.0-alpha1. To edit this project, is recomended to use the *Import Project* from Android Studio, since the local project settings are not commited to this repository.
+**Before building the project**, you need to request an API key using the [API website](https://developers.themoviedb.org/3/getting-started) and place the value under your `gradle.properties` file with the name `moviedb.api_key`. For example: `moviedb.api_key="api_key_here"`.
 The application can also be built using command line. In a machine with Java 8 or newer installed and configured, checkout the root project and run `gradlew assembleDebug`. The resulting APK can be found in `project/app/build/outputs/apk`.
 
 ### Third-party Libraries 
