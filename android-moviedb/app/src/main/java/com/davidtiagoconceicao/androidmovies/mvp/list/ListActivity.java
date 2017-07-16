@@ -23,7 +23,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity
+public class ListActivity extends AppCompatActivity
         implements UpcomingListContract.View,
         LoadMoreScrollListener.LoadMoreListener,
         SwipeRefreshLayout.OnRefreshListener {
