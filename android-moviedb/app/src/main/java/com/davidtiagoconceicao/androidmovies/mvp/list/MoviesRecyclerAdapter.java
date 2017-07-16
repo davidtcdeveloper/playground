@@ -1,4 +1,4 @@
-package com.davidtiagoconceicao.androidmovies.list;
+package com.davidtiagoconceicao.androidmovies.mvp.list;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

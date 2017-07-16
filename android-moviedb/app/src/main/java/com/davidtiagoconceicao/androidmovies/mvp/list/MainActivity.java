@@ -1,4 +1,4 @@
-package com.davidtiagoconceicao.androidmovies.list;
+package com.davidtiagoconceicao.androidmovies.mvp.list;
 
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -16,7 +16,7 @@ import com.davidtiagoconceicao.androidmovies.data.Movie;
 import com.davidtiagoconceicao.androidmovies.data.remote.configuration.ConfigurationRepository;
 import com.davidtiagoconceicao.androidmovies.data.remote.genre.GenresRemoteRepository;
 import com.davidtiagoconceicao.androidmovies.data.remote.movie.MoviesRemoteRepository;
-import com.davidtiagoconceicao.androidmovies.search.SearchActivity;
+import com.davidtiagoconceicao.androidmovies.mvp.search.SearchActivity;
 
 import java.util.List;
 

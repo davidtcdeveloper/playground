@@ -11,7 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="false"
         android:theme="@style/AppBaseTheme">
-        <activity android:name=".list.MainActivity">
+        <activity android:name=".mvp.list.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -20,17 +20,17 @@
         </activity>
         <activity
             android:name=".details.DetailsActivity"
-            android:parentActivityName=".list.MainActivity">
+            android:parentActivityName=".mvp.list.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".list.MainActivity" />
+                android:value=".mvp.list.MainActivity" />
         </activity>
         <activity
-            android:name=".search.SearchActivity"
-            android:parentActivityName=".list.MainActivity">
+            android:name=".mvp.search.SearchActivity"
+            android:parentActivityName=".mvp.list.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".list.MainActivity" />
+                android:value=".mvp.list.MainActivity" />
         </activity>
     </application>
 

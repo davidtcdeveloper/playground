@@ -1,4 +1,4 @@
-package com.davidtiagoconceicao.androidmovies.search;
+package com.davidtiagoconceicao.androidmovies.mvp.search;
 
 import android.util.Log;
 import android.util.LongSparseArray;
@@ -18,7 +18,6 @@ import io.reactivex.BackpressureStrategy;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import io.reactivex.subjects.PublishSubject;

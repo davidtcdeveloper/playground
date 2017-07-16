@@ -1,4 +1,4 @@
-package com.davidtiagoconceicao.androidmovies.list;
+package com.davidtiagoconceicao.androidmovies.mvp.list;
 
 import android.util.Log;
 import android.util.LongSparseArray;
@@ -13,10 +13,8 @@ import com.davidtiagoconceicao.androidmovies.data.remote.movie.MoviesRemoteRepos
 
 import java.util.List;
 
-import io.reactivex.BackpressureStrategy;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Action;
 import io.reactivex.functions.Function;
 import io.reactivex.observers.ResourceSingleObserver;
 import io.reactivex.subscribers.ResourceSubscriber;

@@ -1,4 +1,4 @@
-package com.davidtiagoconceicao.androidmovies;
+package com.davidtiagoconceicao.androidmovies.mvp;
 
 /**
  * Base interface for presenters.

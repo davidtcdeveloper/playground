@@ -1,4 +1,4 @@
-package com.davidtiagoconceicao.androidmovies.search;
+package com.davidtiagoconceicao.androidmovies.mvp.search;
 
 import android.content.Context;
 import android.content.Intent;
@@ -20,7 +20,7 @@ import com.davidtiagoconceicao.androidmovies.data.Movie;
 import com.davidtiagoconceicao.androidmovies.data.remote.configuration.ConfigurationRepository;
 import com.davidtiagoconceicao.androidmovies.data.remote.genre.GenresRemoteRepository;
 import com.davidtiagoconceicao.androidmovies.data.remote.movie.MoviesRemoteRepository;
-import com.davidtiagoconceicao.androidmovies.list.MoviesRecyclerAdapter;
+import com.davidtiagoconceicao.androidmovies.mvp.list.MoviesRecyclerAdapter;
 
 import java.util.List;
 

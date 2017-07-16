@@ -1,7 +1,7 @@
-package com.davidtiagoconceicao.androidmovies.list;
+package com.davidtiagoconceicao.androidmovies.mvp.list;
 
-import com.davidtiagoconceicao.androidmovies.BasePresenter;
-import com.davidtiagoconceicao.androidmovies.BaseView;
+import com.davidtiagoconceicao.androidmovies.mvp.BasePresenter;
+import com.davidtiagoconceicao.androidmovies.mvp.BaseView;
 import com.davidtiagoconceicao.androidmovies.data.Movie;
 
 import java.util.List;
